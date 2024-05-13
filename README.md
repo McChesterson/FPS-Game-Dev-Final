@@ -1,2 +1,2 @@
 # FPS-Game-Dev-Final
- This is my final project for my game development class. It's a first person shooter game.
+ This is my final project for my game development class. It's a an online first person shooter game that will involve a free-for-all gamemode that people can join and play in. Try to rack up as many points as you can!
