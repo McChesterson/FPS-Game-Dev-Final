@@ -18,10 +18,12 @@ public class ConnectionStarter : MonoBehaviour
     }
     private void OnClientConnectionState(ClientConnectionStateArgs args)
     {
+        
         if (args.ConnectionState == LocalConnectionState.Stopping)
         {
             UnityEditor.EditorApplication.isPlaying = false;
         }
+        
     }
 
     private void Start()
@@ -35,7 +37,7 @@ public class ConnectionStarter : MonoBehaviour
             Debug.LogError("Couldn't get Tugboat", this);
             return;
         }
-
+        
         if (ParrelSync.ClonesManager.IsClone())
         {
             _tugboat.StartConnection(false);
@@ -45,5 +47,6 @@ public class ConnectionStarter : MonoBehaviour
             _tugboat.StartConnection(true);
             _tugboat.StartConnection(false);
         }
+        
     }
 }

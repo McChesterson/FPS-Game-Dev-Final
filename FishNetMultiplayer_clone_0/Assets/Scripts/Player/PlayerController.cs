@@ -8,6 +8,37 @@ public class PlayerController : NetworkBehaviour
 {
     public static Dictionary<int, PlayerController> Players = new Dictionary<int, PlayerController>();
 
+    /*
+    [Header("Movement")]
+    public float moveSpeed;
+
+    public float groundDrag;
+
+    public float jumpForce;
+    public float jumpCooldown;
+    public float airMultiplier;
+    bool readyToJump;
+
+    [HideInInspector] public float walkSpeed;
+    [HideInInspector] public float sprintSpeed;
+
+    [Header("Keybinds")]
+    public KeyCode jumpKey = KeyCode.Space;
+
+    [Header("Ground Check")]
+    public float playerHeight;
+    public LayerMask whatIsGround;
+    bool grounded;
+
+    public Transform orientation;
+
+    float horizontalInput;
+    float verticalInput;
+
+    Vector3 moveDirection;
+    */
+    Rigidbody rb;
+
     [Header("Base Setup")]
     public float walkingSpeed = 7.5f;
     public float runningSpeed = 11.5f;
@@ -18,7 +49,7 @@ public class PlayerController : NetworkBehaviour
     [SerializeField] private int playerSelfLayer = 7;
 
     CharacterController characterController;
-    Vector3 moveDirection = Vector3.zero;
+    Vector3 _moveDirection = Vector3.zero;
     float rotationX = 0;
 
     [HideInInspector]
@@ -42,7 +73,6 @@ public class PlayerController : NetworkBehaviour
 
         if (base.IsOwner)
         {
-
 
             visorObject.SetActive(false);
             playerCamera = Camera.main;
@@ -82,6 +112,10 @@ public class PlayerController : NetworkBehaviour
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+        //rb = GetComponent<Rigidbody>();
+        //rb.freezeRotation = true;
+
+        //readyToJump = true;
     }
 
     void Update()
@@ -94,26 +128,31 @@ public class PlayerController : NetworkBehaviour
         Vector3 forward = transform.TransformDirection(Vector3.forward);
         Vector3 right = transform.TransformDirection(Vector3.right);
 
-        float curSpeedX = canMove ? (isRunning ? runningSpeed : walkingSpeed) * Input.GetAxis("Vertical") : 0;
-        float curSpeedY = canMove ? (isRunning ? runningSpeed : walkingSpeed) * Input.GetAxis("Horizontal") : 0;
-        float movementDirectionY = moveDirection.y;
-        moveDirection = (forward * curSpeedX) + (right * curSpeedY);
+        Vector2 input;
+        input = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+        input.Normalize();
+
+        float curSpeedX = canMove ? (isRunning ? runningSpeed : walkingSpeed) * input.y : 0;
+        float curSpeedY = canMove ? (isRunning ? runningSpeed : walkingSpeed) * input.x : 0;
+        
+        float movementDirectionY = _moveDirection.y;
+        _moveDirection = (forward * curSpeedX) + (right * curSpeedY);
 
         if (Input.GetButton("Jump") && canMove && characterController.isGrounded)
         {
-            moveDirection.y = jumpSpeed;
+            _moveDirection.y = jumpSpeed;
         }
         else
         {
-            moveDirection.y = movementDirectionY;
+            _moveDirection.y = movementDirectionY;
         }
         if (!characterController.isGrounded)
         {
-            moveDirection.y -= gravity * Time.deltaTime;
+            _moveDirection.y -= gravity * Time.deltaTime;
         }
 
         //move the controller
-        characterController.Move(moveDirection * Time.deltaTime);
+        characterController.Move(_moveDirection * Time.deltaTime);
 
         //player and camera rotation
         if(canMove && playerCamera != null)
@@ -124,7 +163,59 @@ public class PlayerController : NetworkBehaviour
             transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeed, 0);
         }
     }
+    /*
+    private void MyInput()
+    {
+        horizontalInput = Input.GetAxisRaw("Horizontal");
+        verticalInput = Input.GetAxisRaw("Verticle");
 
+        //when to jump
+        if(Input.GetKey(jumpKey) && readyToJump && grounded)
+        {
+            readyToJump = false;
+
+            Jump();
+
+            Invoke(nameof(ResetJump), jumpCooldown);
+        }
+    }
+    private void MovePlayer()
+    {
+        //calculate movement direction
+        moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
+
+        //on ground
+        if (grounded)
+            rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
+
+        //in air
+        else if (!grounded)
+            rb.AddForce(moveDirection.normalized * moveSpeed * 10f * airMultiplier, ForceMode.Force);
+    }
+    private void SpeedControl()
+    {
+        Vector3 flatVel = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+
+        //limit velocity if needed
+        if(flatVel.magnitude > moveSpeed)
+        {
+            Vector3 limitedVel = flatVel.normalized * moveSpeed;
+            rb.velocity = new Vector3(limitedVel.x, rb.velocity.y, limitedVel.z);
+        }
+    }
+    private void Jump()
+    {
+        //reset y velocity
+        rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+    }
+    private void ResetJump()
+    {
+        readyToJump = true;
+    }
+    */
+
+
+    //network methods
     public static void SetPlayerPosition(int clientID, Vector3 position)
     {
         if (!Players.TryGetValue(clientID, out PlayerController player))

@@ -80,7 +80,11 @@ public class PlayerWepon : NetworkBehaviour
     public void InitializeWeapons(Transform parentOfWeapons)
     {
         for (int i = 0; i < weapons.Count; i++)
+        {
             weapons[i].transform.SetParent(parentOfWeapons);
+            weapons[i].transform.rotation *= Quaternion.Euler(new Vector3(-1, -1, -1));
+
+        }
         /*
         if (weapons.Count > 0)
         {
@@ -104,6 +108,17 @@ public class PlayerWepon : NetworkBehaviour
 
         //inializes the weapon that was just added
         InitializeWeapon(_AGroundWeapon.weaponIndex);
+    }
+    public bool ContainsInInventory(int groundWeaponIndex)
+    {
+        for (int i = 0; i < heldWeapons.Count; i++)
+        {
+            if (heldWeapons[i] == weapons[groundWeaponIndex])
+            {
+                return true;
+            }
+        }
+        return false;
     }
     //sets the current weapon being held
     public void InitializeWeapon(int weaponIndex)

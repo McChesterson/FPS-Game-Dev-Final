@@ -2,12 +2,15 @@ using FishNet.Object;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class PlayerPickup : NetworkBehaviour
 {
     [SerializeField] private float pickupRange = 4f;
     [SerializeField] private KeyCode pickupKey = KeyCode.E;
     [SerializeField] private LayerMask pickupLayers;
+    [SerializeField] private TextMeshProUGUI pickupPrompt;
+    public bool pickupPrompOn;
     private Transform cameraTransform;
     private PlayerWepon playerWeapon;
 
@@ -27,6 +30,13 @@ public class PlayerPickup : NetworkBehaviour
     }
     private void Update()
     {
+        //if (Physics.Raycast(cameraTransform.position, cameraTransform.forward, out RaycastHit hit, pickupRange, pickupLayers))
+        //{
+        //    if (hit.transform.TryGetComponent(out AGroundWeapon groundWeapon))
+        //    {
+        //        Debug.Log("Looking at Ground Weapon");
+        //    }
+        //}
         if (Input.GetKeyDown(pickupKey))
         {
             Pickup();
@@ -44,6 +54,9 @@ public class PlayerPickup : NetworkBehaviour
         if (hit.transform.TryGetComponent(out AGroundWeapon groundWeapon))
         {
             Debug.Log("Hit Ground Weapon");
+            
+
+
             playerWeapon.AddWeapon(groundWeapon);
             DestroyWeapon(hit.transform.gameObject);
         }

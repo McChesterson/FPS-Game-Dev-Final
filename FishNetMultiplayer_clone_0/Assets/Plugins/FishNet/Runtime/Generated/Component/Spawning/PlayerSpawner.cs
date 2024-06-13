@@ -3,7 +3,6 @@ using FishNet.Managing;
 using FishNet.Object;
 using System;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace FishNet.Component.Spawning
 {
@@ -121,7 +120,6 @@ namespace FishNet.Component.Spawning
                 SetSpawnUsingPrefab(prefab, out pos, out rot);
                 return;
             }
-
             Transform result = Spawns[_nextSpawn];
             if (result == null)
             {
@@ -132,11 +130,11 @@ namespace FishNet.Component.Spawning
                 pos = result.position;
                 rot = result.rotation;
             }
-
             //Increase next spawn and reset if needed.
             _nextSpawn++;
             if (_nextSpawn >= Spawns.Length)
                 _nextSpawn = 0;
+
         }
 
         /// <summary>
