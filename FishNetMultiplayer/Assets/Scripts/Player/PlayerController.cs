@@ -7,37 +7,7 @@ using FishNet.Connection;
 public class PlayerController : NetworkBehaviour
 {
     public static Dictionary<int, PlayerController> Players = new Dictionary<int, PlayerController>();
-
-    /*
-    [Header("Movement")]
-    public float moveSpeed;
-
-    public float groundDrag;
-
-    public float jumpForce;
-    public float jumpCooldown;
-    public float airMultiplier;
-    bool readyToJump;
-
-    [HideInInspector] public float walkSpeed;
-    [HideInInspector] public float sprintSpeed;
-
-    [Header("Keybinds")]
-    public KeyCode jumpKey = KeyCode.Space;
-
-    [Header("Ground Check")]
-    public float playerHeight;
-    public LayerMask whatIsGround;
-    bool grounded;
-
-    public Transform orientation;
-
-    float horizontalInput;
-    float verticalInput;
-
-    Vector3 moveDirection;
-    */
-    Rigidbody rb;
+    public PlayerWepon _playerWeapon;
 
     [Header("Base Setup")]
     public float walkingSpeed = 7.5f;
@@ -79,9 +49,10 @@ public class PlayerController : NetworkBehaviour
             playerCamera.transform.position = new Vector3(transform.position.x, transform.position.y + cameraYOffset, transform.position.z);
             playerCamera.transform.SetParent(transform);
 
-            if(TryGetComponent(out PlayerWepon playerWepon))
+            if (TryGetComponent(out PlayerWepon playerWepon))
             {
                 playerWepon.InitializeWeapons(playerCamera.transform);
+                _playerWeapon = playerWepon;
             }
 
             gameObject.layer = playerSelfLayer;
@@ -134,7 +105,7 @@ public class PlayerController : NetworkBehaviour
 
         float curSpeedX = canMove ? (isRunning ? runningSpeed : walkingSpeed) * input.y : 0;
         float curSpeedY = canMove ? (isRunning ? runningSpeed : walkingSpeed) * input.x : 0;
-        
+
         float movementDirectionY = _moveDirection.y;
         _moveDirection = (forward * curSpeedX) + (right * curSpeedY);
 
@@ -155,7 +126,7 @@ public class PlayerController : NetworkBehaviour
         characterController.Move(_moveDirection * Time.deltaTime);
 
         //player and camera rotation
-        if(canMove && playerCamera != null)
+        if (canMove && playerCamera != null)
         {
             rotationX += -Input.GetAxis("Mouse Y") * lookSpeed;
             rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
@@ -163,63 +134,18 @@ public class PlayerController : NetworkBehaviour
             transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeed, 0);
         }
     }
-    /*
-    private void MyInput()
-    {
-        horizontalInput = Input.GetAxisRaw("Horizontal");
-        verticalInput = Input.GetAxisRaw("Verticle");
-
-        //when to jump
-        if(Input.GetKey(jumpKey) && readyToJump && grounded)
-        {
-            readyToJump = false;
-
-            Jump();
-
-            Invoke(nameof(ResetJump), jumpCooldown);
-        }
-    }
-    private void MovePlayer()
-    {
-        //calculate movement direction
-        moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
-
-        //on ground
-        if (grounded)
-            rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
-
-        //in air
-        else if (!grounded)
-            rb.AddForce(moveDirection.normalized * moveSpeed * 10f * airMultiplier, ForceMode.Force);
-    }
-    private void SpeedControl()
-    {
-        Vector3 flatVel = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
-
-        //limit velocity if needed
-        if(flatVel.magnitude > moveSpeed)
-        {
-            Vector3 limitedVel = flatVel.normalized * moveSpeed;
-            rb.velocity = new Vector3(limitedVel.x, rb.velocity.y, limitedVel.z);
-        }
-    }
-    private void Jump()
-    {
-        //reset y velocity
-        rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
-    }
-    private void ResetJump()
-    {
-        readyToJump = true;
-    }
-    */
-
 
     //network methods
     public static void SetPlayerPosition(int clientID, Vector3 position)
     {
         if (!Players.TryGetValue(clientID, out PlayerController player))
             return;
+
+        //empties the players inventory
+        //this code is called here becuase SetPlayerPosition is only called on a respawn
+        //(it's jank, but it works)
+        //PS: it doesn't work
+        //player._playerWeapon.ResetInventory();
 
         player.SetPlayerPositionServer(position);
     }

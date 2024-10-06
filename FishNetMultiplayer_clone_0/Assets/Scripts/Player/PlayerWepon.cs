@@ -13,11 +13,6 @@ public class PlayerWepon : NetworkBehaviour
     private readonly SyncVar<int> currentWeaponIndex = new(-1);
 
     [SerializeField] int maxInvSize;
-    /// <summary>
-    /// Checks if the player already has _groundWeapon in their heldWeapons
-    /// </summary>
-    /// <param name="_groundWeapon"></param>
-    /// <returns></returns>
     bool holdsWeapon(AGroundWeapon _groundWeapon)
     {
         return false;
@@ -83,18 +78,9 @@ public class PlayerWepon : NetworkBehaviour
         {
             weapons[i].transform.SetParent(parentOfWeapons);
             weapons[i].transform.rotation *= Quaternion.Euler(new Vector3(-1, -1, -1));
-
         }
-        /*
-        if (weapons.Count > 0)
-        {
-            currentWeapon = weapons[0];
-            InitializeWeapon(0);
-        }
-        */
-
     }
-    //adds a weapon from the weapon list to the 
+    //adds a weapon from the weapon list to the held weapons list
     public void AddWeapon(AGroundWeapon _AGroundWeapon)
     {
         //checks if the player already has the weapon their grabbing in their inventory
@@ -109,6 +95,11 @@ public class PlayerWepon : NetworkBehaviour
         //inializes the weapon that was just added
         InitializeWeapon(_AGroundWeapon.weaponIndex);
     }
+    //public void ResetInventory()
+    //{
+    //    heldWeapons.Clear();
+    //    SetWeaponIndex(-1);
+    //}
     public bool ContainsInInventory(int groundWeaponIndex)
     {
         for (int i = 0; i < heldWeapons.Count; i++)

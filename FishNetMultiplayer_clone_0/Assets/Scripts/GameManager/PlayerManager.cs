@@ -90,7 +90,7 @@ public class PlayerManager : NetworkBehaviour
 
     public class Player
     {
-        private List<string> regularNames = new List<string>() { "Jeff", "Bob", "Billy", "Joe", "That One Guy", "Yoink" };
+        private List<string> regularNames = new List<string>() { "Jeff", "Bob", "Billy", "Joe", "That Guy", "Yoink" };
 
         public string playerName = null;
 
